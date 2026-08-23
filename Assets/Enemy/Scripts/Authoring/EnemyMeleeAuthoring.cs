@@ -42,6 +42,7 @@ public class EnemyMeleeAuthoring : MonoBehaviour
             });
 
             AddComponent<EnemyMeleeTag>(entity);
+            AddComponent<IndependentTag>(entity);
         }
     }
 }
