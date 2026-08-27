@@ -3,8 +3,9 @@ using UnityEngine;
 
 public class GroupConfigAuthoring : MonoBehaviour
 {
-    public int RequiredGroupSize = 5;
-    public float FormationRadius = 10f;
+    public int MinRequiredGroupSize = 4;
+    public int MaxRequiredGroupSize = 5;
+    public float FormationRadius = 1f;
     public float FormationTime = 5f;
 
     class Baker : Baker<GroupConfigAuthoring>
@@ -18,8 +19,9 @@ public class GroupConfigAuthoring : MonoBehaviour
 
             AddComponent(entity, new GroupFormationConfigComponent
             {
-                RequiredGroupSize = authoring.RequiredGroupSize,
-                FormationRadius = authoring.FormationRadius,
+                MinRequiredGroupSize = authoring.MinRequiredGroupSize,
+                MaxRequiredGroupSize = authoring.MaxRequiredGroupSize,
+                FormationRadius = authoring.FormationRadius / 2,        // if not divide it's gonna search in diameter
                 FormationTime = authoring.FormationTime
             });
         }

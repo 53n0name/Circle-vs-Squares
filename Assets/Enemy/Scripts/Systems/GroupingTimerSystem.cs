@@ -17,7 +17,7 @@ public partial struct GroupingTimerSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
 
         // Перебираем все Трекеры
-        foreach (var (timer, buffer, trackerEntity) in SystemAPI.Query<RefRW<GroupingTimer>, DynamicBuffer<FormingGroupElement>>().WithEntityAccess())
+        foreach (var (timer, buffer, trackerEntity) in SystemAPI.Query<RefRW<GroupingTimerComponent>, DynamicBuffer<FormingGroupElement>>().WithEntityAccess())
         {
             bool isGroupValid = true;
 
@@ -54,7 +54,7 @@ public partial struct GroupingTimerSystem : ISystem
                 }
             }
 
-            // ЕСЛИ ГРУППА РАСПАЛАСЬ (Отмена)
+            // ЕСЛИ ГРУППА РАСПАЛАСЬ
             if (!isGroupValid)
             {
                 for (int i = 0; i < buffer.Length; i++)
@@ -79,6 +79,16 @@ public partial struct GroupingTimerSystem : ISystem
             if (timer.ValueRO.TimeRemaining <= 0f)
             {
                 Entity finalGroupEntity = ecb.CreateEntity();
+
+                // Заранее сохраняем лидера (он всегда нулевой в нашем буфере)
+                Entity commanderEntity = buffer[0].EnemyEntity;
+
+                // Вешаем на саму группу данные о её лидере
+                ecb.AddComponent(finalGroupEntity, new GroupStateComponent
+                {
+                    CommanderEntity = commanderEntity,
+                    TotalMembers = buffer.Length
+                });
 
                 for (int i = 0; i < buffer.Length; i++)
                 {

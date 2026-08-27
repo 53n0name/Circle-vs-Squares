@@ -7,6 +7,14 @@ using Unity.Mathematics;
 [BurstCompile]
 public partial struct GroupingDirectorSystem : ISystem
 {
+
+    //private struct DistanceDebugRecord
+    //{
+    //    public int CommanderIndex;
+    //    public int CheckedEnemyIndex;
+    //    public float Distance;
+    //}
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
@@ -32,9 +40,13 @@ public partial struct GroupingDirectorSystem : ISystem
             var potentialGroup = new NativeList<int>(Allocator.Temp);
             potentialGroup.Add(i);
 
-            for (int j = i + 1; j < entities.Length; j++)
+            //var debugRecords = new NativeList<DistanceDebugRecord>(Allocator.Temp);
+
+            for (int j = 0; j < entities.Length; j++)
             {
                 if (alreadyGrouped[j]) continue;
+
+                if (entities[i] == entities[j]) continue;
 
                 // 2D математика
                 float dist = math.distance(transforms[i].Position.xy, transforms[j].Position.xy);
@@ -42,21 +54,43 @@ public partial struct GroupingDirectorSystem : ISystem
                 if (dist <= config.FormationRadius)
                 {
                     potentialGroup.Add(j);
+
+                    //// 2. Сохраняем данные текущей проверки в список
+                    //debugRecords.Add(new DistanceDebugRecord
+                    //{
+                    //    CommanderIndex = entities[i].Index,
+                    //    CheckedEnemyIndex = entities[j].Index,
+                    //    Distance = dist
+                    //});
                 }
 
-                if (potentialGroup.Length >= config.RequiredGroupSize)
-                    break;
+
+                // 3. Проверяем условие break
+                if (potentialGroup.Length >= config.MaxRequiredGroupSize)
+                {
+                    //UnityEngine.Debug.Log(config.FormationRadius);
+
+                    //// 4. Выводим весь накопленный список перед выходом
+                    //UnityEngine.Debug.Log($"--- Группа собрана! Командир ID: {entities[i].Index}. Лог проверок: ---");
+
+                    //for (int k = 0; k < debugRecords.Length; k++)
+                    //{
+                    //    var record = debugRecords[k];
+                    //    UnityEngine.Debug.Log($"Враг 1: {record.CommanderIndex} | Враг 2: {record.CheckedEnemyIndex} | Расстояние: {record.Distance}");
+                    //}
+                    break; // Выходим из внутреннего цикла
+                }
             }
 
             // Если нашли нужное количество - ЗАПУСКАЕМ ПРОЦЕСС
-            if (potentialGroup.Length >= config.RequiredGroupSize)
+            if (potentialGroup.Length >= config.MinRequiredGroupSize)
             {
                 Entity trackerEntity = ecb.CreateEntity();
 
                 // Создаем динамический буфер на трекере для хранения будущих участников
                 var buffer = ecb.AddBuffer<FormingGroupElement>(trackerEntity);
 
-                ecb.AddComponent(trackerEntity, new GroupingTimer
+                ecb.AddComponent(trackerEntity, new GroupingTimerComponent
                 {
                     TimeRemaining = config.FormationTime,
                     PotentialCommander = entities[potentialGroup[0]] // Центр круга
