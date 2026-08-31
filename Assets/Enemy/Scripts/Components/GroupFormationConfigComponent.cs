@@ -7,4 +7,5 @@ public struct GroupFormationConfigComponent : IComponentData
     public int MaxRequiredGroupSize;
     public float FormationRadius;
     public float FormationTime;     // Заданное время для создания 
+    public float PointsDistance;
 }

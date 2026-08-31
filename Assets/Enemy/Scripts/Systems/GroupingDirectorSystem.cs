@@ -23,10 +23,9 @@ public partial struct GroupingDirectorSystem : ISystem
 
         var ecb = new EntityCommandBuffer(Allocator.TempJob);
 
-        // ВАЖНО: Исключаем тех, кто уже в процессе группировки (.WithNone<FormingGroupTag>())
         var query = SystemAPI.QueryBuilder()
             .WithAll<EnemyMeleeTag, IndependentTag, LocalTransform>()
-            .WithNone<FormingGroupTag>()
+            .WithNone<FormingGroupTag, InGroupTag, CommanderTag>()
             .Build();
 
         var entities = query.ToEntityArray(Allocator.Temp);
@@ -102,8 +101,9 @@ public partial struct GroupingDirectorSystem : ISystem
                     Entity enemy = entities[index];
                     alreadyGrouped[index] = true;
 
-                    // Вешаем защитный тег. (IndependentTag НЕ снимаем, они продолжают бежать!)
+                    // Вешаем защитный тег
                     ecb.AddComponent<FormingGroupTag>(enemy);
+                    ecb.RemoveComponent<IndependentTag>(enemy);
 
                     // Записываем врага в буфер трекера
                     buffer.Add(new FormingGroupElement { EnemyEntity = enemy });

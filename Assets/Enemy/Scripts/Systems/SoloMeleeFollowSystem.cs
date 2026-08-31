@@ -16,7 +16,8 @@ public partial struct SoloMeleeFollowSystem : ISystem
 
         // Запрашиваем PhysicsVelocity для изменения (RefRW) и LocalTransform (RefRW для поворота)
         foreach (var (velocity, transform, speed, attackRange) in SystemAPI.Query<RefRW<PhysicsVelocity>, RefRW<LocalTransform>, RefRO<EnemyMovementSpeedComponent>, RefRO<EnemyAttackRangeComponent>>()
-                     .WithAll<EnemyMeleeTag, IndependentTag>())
+                     .WithAll<EnemyMeleeTag>()
+                     .WithAny<IndependentTag, FormingGroupTag, CommanderTag>())
         {
             float distance = math.distance(transform.ValueRO.Position.xy, playerPos.xy);
             float distanceToEdge = distance - attackRange.ValueRO.RangeAttack;

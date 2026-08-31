@@ -7,6 +7,7 @@ public class GroupConfigAuthoring : MonoBehaviour
     public int MaxRequiredGroupSize = 5;
     public float FormationRadius = 1f;
     public float FormationTime = 5f;
+    public float PointsDistance = 0.05f;
 
     class Baker : Baker<GroupConfigAuthoring>
     {
@@ -22,7 +23,8 @@ public class GroupConfigAuthoring : MonoBehaviour
                 MinRequiredGroupSize = authoring.MinRequiredGroupSize,
                 MaxRequiredGroupSize = authoring.MaxRequiredGroupSize,
                 FormationRadius = authoring.FormationRadius / 2,        // if not divide it's gonna search in diameter
-                FormationTime = authoring.FormationTime
+                FormationTime = authoring.FormationTime,
+                PointsDistance = authoring.PointsDistance
             });
         }
     }

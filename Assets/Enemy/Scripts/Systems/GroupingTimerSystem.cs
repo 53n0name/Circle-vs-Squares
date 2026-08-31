@@ -90,12 +90,13 @@ public partial struct GroupingTimerSystem : ISystem
                     TotalMembers = buffer.Length
                 });
 
+                ecb.AddBuffer<WaypointElement>(finalGroupEntity);
+
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     Entity enemy = buffer[i].EnemyEntity;
 
                     // Снимаем старые теги (включая защитный)
-                    ecb.RemoveComponent<IndependentTag>(enemy);
                     ecb.RemoveComponent<FormingGroupTag>(enemy);
 
                     // Выдаем финальные групповые теги
